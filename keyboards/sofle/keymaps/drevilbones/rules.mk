@@ -1,0 +1,23 @@
+# non-negotiables
+LTO_ENABLE = yes
+RGB_MATRIX_ENABLE = yes
+ENCODER_ENABLE = yes
+OLED_ENABLE = yes
+MOUSEKEY_ENABLE = yes
+EXTRAKEY_ENABLE = yes
+POINTING_DEVICE_ENABLE = yes
+POINTING_DEVICE_DRIVER = pimoroni_trackball
+
+# if there's space (which there isn't)
+KEY_LOCK_ENABLE = no
+CAPS_WORD_ENABLE = no
+CONSOLE_ENABLE = no
+VERBOSE = no
+
+# do not want
+GRAVE_ESC_ENABLE = no
+SPACE_CADET_ENABLE = no
+MAGIC_ENAGLE = no
+BOOTMAGIC_ENABLE = no
+SWAP_HANDS_ENABLE = no
+COMMAND_ENABLE = no
