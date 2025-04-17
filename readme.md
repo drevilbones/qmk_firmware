@@ -4,7 +4,7 @@ My personal QMK fork for all my keyboards. I used to keep them all in individual
 
 Each keyboard has it's own branch.
 
-The boards:
+The boards:<br/>
 [bamboored](https://github.com/drevilbones/qmk_firmware/tree/bamboored/keyboards/bamboored)<br/>
 [checkerboard](https://github.com/drevilbones/qmk_firmware/tree/checkerboard/keyboards/1upkeyboards/pi60/keymaps/drevilbones)<br/>
 [drop alt](https://github.com/drevilbones/qmk_firmware/tree/dropalt/keyboards/drop/alt/keymaps/drevilbones)<br/>
