@@ -31,7 +31,6 @@
 
 // space saving
 #define LAYER_STATE_8BIT
-#define NO_ACTION_TAPPING
 #define NO_ACTION_ONESHOT
 #undef LOCKING_SUPPORT_ENABLE
 #undef LOCKING_RESYNC_ENABLE
