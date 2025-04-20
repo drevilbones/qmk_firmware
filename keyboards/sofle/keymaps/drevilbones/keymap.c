@@ -69,7 +69,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 [NAVI] = LAYOUT( //navigation
   KC_TILD, _______, _______, _______, _______, _______,                   _______, _______, _______, _______, _______,  KC_DEL,
   _______, _______, KC_PGUP, _______, _______, _______,                   _______, _______, _______, _______, _______, _______,
-  _______, KC_HOME, KC_PGDN, KC_END,  _______, _______,                    KC_LEFT, KC_DOWN, KC_UP,   KC_RGHT, _______, _______,
+  _______, KC_HOME, KC_PGDN, KC_END,  _______, _______,                   KC_LEFT, KC_DOWN, KC_UP,   KC_RGHT, _______, _______,
   KC_CAPS, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
                     _______, _______, _______, _______, _______, _______, _______, _______, _______, _______
 ),
@@ -84,8 +84,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
 [MAUS] = LAYOUT( //mouse
   _______, _______, _______, _______, _______, _______,                   _______, _______, _______, _______, _______, _______,
-  _______, _______, _______, _______, _______, _______,                   _______, MB1HLD,  _______, _______, _______, _______,
-  _______, _______, _______, _______, _______, _______,                   _______, MS_BTN1, MS_BTN3, MS_BTN2, _______, _______,
+  _______, _______, _______, _______, MB1HLD,  _______,                   _______, MB1HLD,  _______, _______, _______, _______,
+  _______, _______, MS_BTN2, MS_BTN3, MS_BTN1, _______,                   _______, MS_BTN1, MS_BTN3, MS_BTN2, _______, _______,
   _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
                     _______, _______, _______, _______, _______, _______, _______, _______, _______, _______
 ),
@@ -110,6 +110,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
 };
 
+
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
   switch (keycode) {
     case MB1HLD:
@@ -118,6 +119,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
       return true;
   }
 }
+
 
 bool mb1held = false;
 bool is_mouse_record_user(uint16_t keycode, keyrecord_t* record) {
@@ -231,6 +233,7 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
   return false;
 }
 
+
 // space saving
 #ifndef MAGIC_ENABLE
 uint16_t keycode_config(uint16_t keycode) {
@@ -242,6 +245,7 @@ uint8_t mod_config(uint8_t mod) {
     return mod;
 }
 #endif
+
 
 #ifdef OLED_ENABLE
 oled_rotation_t oled_init_user(oled_rotation_t rotation) { return OLED_ROTATION_270; }
@@ -295,6 +299,7 @@ void print_layer(void) {
   }
 }
 
+
 void print_caps(void) {
     led_t led_usb_state = host_keyboard_led_state();
     if (led_usb_state.caps_lock) {
@@ -313,6 +318,7 @@ void print_caps(void) {
       oled_write_P(PSTR("   "), false);
     }
 }
+
 
 bool oled_task_user(void) {
   if (is_keyboard_left()) {
