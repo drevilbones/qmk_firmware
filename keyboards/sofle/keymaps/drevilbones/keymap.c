@@ -247,38 +247,51 @@ uint8_t mod_config(uint8_t mod) {
 oled_rotation_t oled_init_user(oled_rotation_t rotation) { return OLED_ROTATION_270; }
 
 void print_layer(void) {
-  uint8_t i;
-  for (i = 1; i <= 8; i++) {
-    oled_set_cursor(0, i);
-    oled_write_ln_P(PSTR("    "), false);
-  }
   oled_set_cursor(0, 0);
+  oled_write_P(PSTR("Layer"), false);
+
+  uint8_t i;
+  for (i = 5; i < 14; i++) {
+    oled_set_cursor(0, i);
+    if (i == 13 || i == 11 || i == 9 || i == 7) {
+      oled_write_P(PSTR("\xAD\xCD\xCD\xCD\xB5"), false);
+    } else if (i == 5) {
+      oled_write_P(PSTR("\xAD\xCD\xCD\xCD\xB8"), false);
+    } else {
+      oled_write_ln_P(PSTR("    \xB3"), false);
+    }
+  }
+  
+  oled_set_cursor(0, 15);
+  oled_write_P(PSTR("\xAD\xCD\xCD\xCD\xBE"), false);
 
   switch (get_highest_layer(layer_state)) {
       case BASE:
-          oled_write_ln_P(PSTR("BASE"), false);
-          break;        
+        oled_set_cursor(0, 14); 
+        oled_write_P(PSTR("BASE\xB3"), false);
+        break;        
       case GAME:
-          oled_write_ln_P(PSTR("GAME"), false);
-          break;
+        oled_set_cursor(0, 14); 
+        oled_write_P(PSTR("GAME\xB3"), false);
+        break;
       case NAVI:
-          oled_set_cursor(0, 2);
-          oled_write_ln_P(PSTR("NAVI"), false);
-          break;
+        oled_set_cursor(0, 12);
+        oled_write_P(PSTR("NAVI\xB3"), false);
+        break;
       case FUNC:
-          oled_set_cursor(0, 4);
-          oled_write_ln_P(PSTR("FUNC"), false);
-          break;
+        oled_set_cursor(0, 10);
+        oled_write_P(PSTR("FUNC\xB3"), false);
+        break;
       case MAUS:
-          oled_set_cursor(0, 6);
-          oled_write_ln_P(PSTR("MAUS"), false);
-          break;
+        oled_set_cursor(0, 8);
+        oled_write_P(PSTR("MAUS\xB3"), false);
+        break;
       case NUMP:
-          oled_set_cursor(0, 8);
-          oled_write_ln_P(PSTR("NUMP"), false);
-          break;
+        oled_set_cursor(0, 6);
+        oled_write_P(PSTR("NUMP\xB3"), false);
+        break;
       default:
-          oled_write_ln_P(PSTR("????"), false);
+        oled_write_ln_P(PSTR("something is broken in layers"), false);
   }
 }
 
@@ -302,12 +315,12 @@ void print_caps(void) {
 }
 
 bool oled_task_user(void) {
-    if (is_keyboard_left()) {
-      print_caps();
-    } else {
-      print_layer();
-    }
-    return false;
+  if (is_keyboard_left()) {
+    print_caps();
+  } else {
+    print_layer();
+  }
+  return false;
 }
 
 #endif //OLED_ENABLE
