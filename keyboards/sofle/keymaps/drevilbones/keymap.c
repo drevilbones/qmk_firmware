@@ -46,6 +46,7 @@ enum my_keycodes {
 enum layer_names {
   BASE,
   GAME,
+  FPS,
   NAVI,
   FUNC,
   MAUS,
@@ -59,15 +60,23 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   KC_TAB,   KC_Q,   KC_W,    KC_E,    KC_R,    KC_T,                      KC_Y,    KC_U,   KC_I,    KC_O,    KC_P,    KC_BSLS,
   KC_GRV,   KC_A,   MT_S,    MT_D,    MT_F,    KC_G,                      KC_H,    MT_J,   MT_K,    MT_L,    KC_SCLN, KC_QUOT,
   KC_LSFT,  KC_Z,   KC_X,    KC_C,    KC_V,    KC_B,  _______,   _______, KC_N,    KC_M,   KC_COMM, KC_DOT,  KC_SLSH, KC_RSFT,
-                    KC_LBRC, KC_RBRC, MO(3),   MO(2), KC_ENT,    MO(2),   KC_SPC,  MO(3),  KC_MINS, KC_EQL
+                    KC_LBRC, KC_RBRC, MO(FUNC),MO(NAVI),KC_ENT,  MO(NAVI),KC_SPC, MO(FUNC),KC_MINS, KC_EQL
 ),
 
-[GAME] = LAYOUT( //games (disabling the tap-hold keys and shifting wasd over to turn it into esdf)
+[GAME] = LAYOUT(//game (disable tap-hold keys
+  KC_ESC,   KC_1,   KC_2,    KC_3,    KC_4,    KC_5,                      KC_6,    KC_7,   KC_8,    KC_9,    KC_0,    KC_BSPC,
+  KC_TAB,   KC_Q,   KC_W,    KC_E,    KC_R,    KC_T,                      KC_Y,    KC_U,   KC_I,    KC_O,    KC_P,    KC_BSLS,
+  KC_LCTL,  KC_A,   KC_S,    KC_D,    KC_F,    KC_G,                      KC_H,    KC_J,   KC_K,    KC_L,    KC_SCLN, KC_QUOT,
+  KC_LSFT,  KC_Z,   KC_X,    KC_C,    KC_V,    KC_B, _______,    _______, KC_N,    KC_M,   KC_COMM, KC_DOT,  KC_SLSH, KC_RSFT,
+                    KC_I,    KC_M,   MO(FUNC),KC_LALT,KC_SPC,   MO(NAVI), KC_ENT, MO(FUNC),KC_MINS, KC_EQL 
+),
+
+[FPS] = LAYOUT( //fps (disabling the tap-hold keys and shifting a column to turn wasd into esdf)
   KC_ESC,   KC_1,   KC_2,    KC_3,    KC_4,    KC_5,                      KC_6,    KC_7,   KC_8,    KC_9,    KC_0,    KC_BSPC,
   KC_TAB,   KC_T,   KC_Q,    KC_W,    KC_E,    KC_R,                      KC_Y,    KC_U,   KC_I,    KC_O,    KC_P,    KC_BSLS,
   KC_LCTL,  KC_G,   KC_A,    KC_S,    KC_D,    KC_F,                      KC_H,    KC_J,   KC_K,    KC_L,    KC_SCLN, KC_QUOT,
   KC_LSFT,  KC_B,   KC_Z,    KC_X,    KC_C,    KC_V,  _______,   _______, KC_N,    KC_M,   KC_COMM, KC_DOT,  KC_SLSH, KC_RSFT,
-                    KC_I,    KC_M,   MO(3), KC_LALT, KC_SPC,     MO(2), KC_ENT,    MO(3),  KC_MINS, KC_EQL 
+                    KC_I,    KC_M,   MO(FUNC), KC_LALT,KC_SPC,       MO(NAVI),  KC_ENT,   MO(FUNC),KC_MINS, KC_EQL 
 ),
 
 [NAVI] = LAYOUT( //navigation
@@ -83,7 +92,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   _______, _______, _______, _______, _______, _______,                   _______, _______, _______, _______, _______, KC_F12,
   _______, _______, _______, _______, _______, _______,                   _______, _______, _______, _______, _______, _______,
   KC_CAPS, _______, _______, _______, _______, _______, _______, _______, _______, _______, KC_MPRV, KC_MNXT, _______, KC_CAPS,
-                    _______, _______, TG(1),   _______, KC_MPLY, KC_MPLY, _______, TG(1),   _______, TG(5)
+                    _______, _______,TG(GAME),_______, KC_MPLY,  KC_MPLY, _______, TG(FPS), _______, TG(NUMP)
 ),
 
 [MAUS] = LAYOUT( //mouse
@@ -98,8 +107,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   _______, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                   KC_CIRC, KC_P7,   KC_P8,   KC_P9,   KC_PAST, _______,
   XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                   XXXXXXX, KC_P4,   KC_P5,   KC_P6,   KC_PERC, KC_PIPE,
   XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                   XXXXXXX, KC_P1,   KC_P2,   KC_P3,   XXXXXXX, XXXXXXX,
-  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, _______, _______, KC_NUM,  KC_P0,   KC_PEQL, KC_PDOT, KC_PSLS, XXXXXXX,
-                    XXXXXXX, XXXXXXX, TG(5),   XXXXXXX, _______, XXXXXXX, _______, KC_PENT, KC_PMNS, KC_PPLS
+  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, _______, _______, KC_NUM,  KC_P0,   KC_PEQL, KC_PDOT, KC_PSLS, KC_ENT,
+                    XXXXXXX, XXXXXXX, TG(NUMP),KC_SPC , _______, XXXXXXX, _______, KC_PENT, KC_PMNS, KC_PPLS
 )
 
 /*
@@ -190,9 +199,13 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
   bool indicators = false;
   uint8_t layer = get_highest_layer(layer_state);
   switch(layer) {
-    case GAME: //games
+    case FPS: //fps
       layer_color_hsv = (hsv_t){HSV_RED};
       rgb_matrix_sethsv_noeeprom(HSV_RED);
+      break;
+    case GAME: //game
+      layer_color_hsv = (hsv_t){HSV_YELLOW};
+      rgb_matrix_sethsv_noeeprom(HSV_YELLOW);
       break;
     case NAVI: // nav
       layer_color_hsv = (hsv_t){HSV_GREEN};
@@ -282,6 +295,10 @@ void print_layer(void) {
         oled_set_cursor(0, 14); 
         oled_write_P(PSTR("GAME\xB3"), false);
         break;
+      case FPS:
+        oled_set_cursor(0, 14); 
+        oled_write_P(PSTR("FPS \xB3"), false);
+        break;       
       case NAVI:
         oled_set_cursor(0, 12);
         oled_write_P(PSTR("NAVI\xB3"), false);
@@ -333,4 +350,4 @@ bool oled_task_user(void) {
   return false;
 }
 
-#endif //OLED_ENABLE
+#endif //OLED_ENABLEM
