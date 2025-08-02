@@ -159,6 +159,7 @@ bool is_mouse_record_user(uint16_t keycode, keyrecord_t* record) {
 
 void pointing_device_init_user(void) {
   set_auto_mouse_enable(true);
+  set_auto_mouse_layer(MAUS);
 }
 
 void keyboard_post_init_user(void) {
