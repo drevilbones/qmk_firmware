@@ -42,6 +42,9 @@ enum my_keycodes {
 
 // default layer color: dull cyan
 #define HSV_DEF 128, 255, 75
+// indexes for the indicator LEDs
+#define LIND 0
+#define RIND 36
 
 enum layer_names {
   BASE,
@@ -76,14 +79,14 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   KC_TAB,   KC_T,   KC_Q,    KC_W,    KC_E,    KC_R,                      KC_Y,    KC_U,   KC_I,    KC_O,    KC_P,    KC_BSLS,
   KC_LCTL,  KC_G,   KC_A,    KC_S,    KC_D,    KC_F,                      KC_H,    KC_J,   KC_K,    KC_L,    KC_SCLN, KC_QUOT,
   KC_LSFT,  KC_B,   KC_Z,    KC_X,    KC_C,    KC_V,  _______,   _______, KC_N,    KC_M,   KC_COMM, KC_DOT,  KC_SLSH, KC_RSFT,
-                    KC_I,    KC_M,   MO(FUNC), KC_LALT,KC_SPC,       MO(NAVI),  KC_ENT,   MO(FUNC),KC_MINS, KC_EQL 
+                    KC_I,    KC_M,   MO(FUNC), KC_LALT,KC_SPC,   MO(NAVI),KC_ENT,  MO(FUNC),KC_MINS,KC_EQL 
 ),
 
 [NAVI] = LAYOUT( //navigation
   _______, _______, _______, _______, _______, _______,                   _______, _______, _______, _______, _______,  KC_DEL,
   _______, _______, KC_PGUP, _______, _______, _______,                   CT_LEFT, _______, _______, CT_RGHT, _______, _______,
   _______, KC_HOME, KC_PGDN, KC_END,  _______, _______,                   KC_LEFT, KC_DOWN, KC_UP,   KC_RGHT, _______, _______,
-  _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
+  QK_LOCK, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, QK_LOCK,
                     _______, _______, _______, _______, _______, _______, _______, _______, _______, _______
 ),
 
@@ -91,7 +94,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   KC_GRV,  KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,                       KC_F6,   KC_F7,   KC_F8,   KC_F9,  KC_F10, KC_F11,  
   _______, _______, _______, _______, _______, _______,                   _______, _______, _______, _______, _______, KC_F12,
   _______, _______, _______, _______, _______, _______,                   _______, _______, _______, _______, _______, _______,
-  KC_CAPS, _______, _______, _______, _______, _______, _______, _______, _______, _______, KC_MPRV, KC_MNXT, _______, KC_CAPS,
+  CW_TOGG, _______, _______, _______, _______, _______, _______, _______, _______, _______, KC_MPRV, KC_MNXT, _______, CW_TOGG,
                     _______, _______,TG(GAME),_______, KC_MPLY,  KC_MPLY, _______, TG(FPS), _______, TG(NUMP)
 ),
 

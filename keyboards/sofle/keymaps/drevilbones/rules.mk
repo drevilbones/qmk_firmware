@@ -8,9 +8,8 @@ EXTRAKEY_ENABLE = yes
 POINTING_DEVICE_ENABLE = yes
 POINTING_DEVICE_DRIVER = pimoroni_trackball
 
-# if there's space (which there isn't)
-KEY_LOCK_ENABLE = no
-CAPS_WORD_ENABLE = no
+KEY_LOCK_ENABLE = yes
+CAPS_WORD_ENABLE = yes
 CONSOLE_ENABLE = no
 VERBOSE = no
 
