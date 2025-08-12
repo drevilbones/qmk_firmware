@@ -36,15 +36,16 @@ enum my_keycodes {
 #define MT_L RCTL_T(KC_L)
 #define MT_SCLN RSFT_T(KC_SCLN)
 
-// Some other alias abbreviations
+// ctrl+arrows left and right, for moving between words
 #define CT_LEFT LCTL(KC_LEFT)
 #define CT_RGHT RCTL(KC_RGHT)
 
 // default layer color: dull cyan
 #define HSV_DEF 128, 255, 75
-// indexes for the indicator LEDs
-#define LIND 0
-#define RIND 36
+
+static uint16_t blink_timer;
+bool caps_indicator;
+
 
 enum layer_names {
   BASE,
@@ -52,8 +53,8 @@ enum layer_names {
   FPS,
   NAVI,
   FUNC,
+  NUMP,
   MAUS,
-  NUMP, 
 };
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -94,16 +95,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   KC_GRV,  KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,                       KC_F6,   KC_F7,   KC_F8,   KC_F9,  KC_F10, KC_F11,  
   _______, _______, _______, _______, _______, _______,                   _______, _______, _______, _______, _______, KC_F12,
   _______, _______, _______, _______, _______, _______,                   _______, _______, _______, _______, _______, _______,
-  CW_TOGG, _______, _______, _______, _______, _______, _______, _______, _______, _______, KC_MPRV, KC_MNXT, _______, CW_TOGG,
+  CW_TOGG, _______, _______, _______, _______, _______, _______, _______, _______, _______, KC_MPRV, KC_MNXT, _______, KC_CAPS,
                     _______, _______,TG(GAME),_______, KC_MPLY,  KC_MPLY, _______, TG(FPS), _______, TG(NUMP)
-),
-
-[MAUS] = LAYOUT( //mouse
-  _______, _______, _______, _______, _______, _______,                   _______, _______, _______, _______, _______, _______,
-  _______, _______, MS_BTN2, MS_BTN3, MS_BTN1, MB1HLD,                    _______, _______, _______, _______, _______, _______,
-  _______, _______, _______, _______, _______, _______,                   _______, _______, _______, _______, _______, _______,
-  _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
-                    _______, _______, _______, _______, _______, _______, _______, _______, _______, _______
 ),
 
 [NUMP] = LAYOUT( //Numpad
@@ -112,6 +105,14 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                   XXXXXXX, KC_P1,   KC_P2,   KC_P3,   XXXXXXX, XXXXXXX,
   XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, _______, _______, KC_NUM,  KC_P0,   KC_PEQL, KC_PDOT, KC_PSLS, KC_ENT,
                     XXXXXXX, XXXXXXX, TG(NUMP),KC_SPC , _______, XXXXXXX, _______, KC_PENT, KC_PMNS, KC_PPLS
+),
+
+[MAUS] = LAYOUT( //mouse
+  _______, _______, _______, _______, _______, _______,                   _______, _______, _______, _______, _______, _______,
+  _______, _______, MS_BTN2, MS_BTN3, MS_BTN1, MB1HLD,                    _______, _______, _______, _______, _______, _______,
+  _______, _______, _______, _______, _______, _______,                   _______, _______, _______, _______, _______, _______,
+  _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
+                    _______, _______, _______, _______, _______, _______, _______, _______, _______, _______
 )
 
 /*
@@ -165,9 +166,23 @@ void pointing_device_init_user(void) {
   set_auto_mouse_layer(MAUS);
 }
 
+
 void keyboard_post_init_user(void) {
   rgb_matrix_sethsv(HSV_DEF);
+  blink_timer = timer_read();
+  caps_indicator = false;
 }
+
+
+void housekeeping_task_user(void) {
+  if (host_keyboard_led_state().caps_lock && timer_elapsed(blink_timer) > 150) {
+    blink_timer = timer_read();
+    caps_indicator = !caps_indicator;
+  } else if (!host_keyboard_led_state().caps_lock) {
+    caps_indicator = false;
+  }
+}
+
 
 bool encoder_update_user(uint8_t index, bool clockwise) {
   switch(get_highest_layer(layer_state)) {
@@ -194,13 +209,14 @@ bool encoder_update_user(uint8_t index, bool clockwise) {
       }
   }
   return false;
- }
+}
 
 
-// index 0 and 36: indicator LEDs
+// index 0 (and 36?): indicator LEDs
 bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
   hsv_t layer_color_hsv = (hsv_t){HSV_DEF};
-  bool indicators = false;
+  bool mouse_indicator = false;
+  bool num_indicator = false;
   uint8_t layer = get_highest_layer(layer_state);
   switch(layer) {
     case FPS: //fps
@@ -218,7 +234,7 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
       layer_color_hsv = (hsv_t){HSV_ORANGE};
       break;
     case MAUS: //mouse
-      indicators = true;
+      mouse_indicator = true;
       layer_color_hsv = (hsv_t){HSV_WHITE};
       break;
     case NUMP: //numpad
@@ -229,15 +245,17 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
       break;      
   }
 
-  if (indicators) {
-    rgb_matrix_set_color(0, RGB_CYAN);
-    rgb_matrix_set_color(36, RGB_CYAN);
+  rgb_t lrgb = hsv_to_rgb(layer_color_hsv);
+
+  num_indicator = (host_keyboard_led_state().num_lock && layer == NUMP); 
+
+  if (caps_indicator || is_caps_word_on()) {
+    rgb_matrix_set_color(0, RGB_RED);
+  } else if (mouse_indicator || num_indicator) {
+    rgb_matrix_set_color(0, lrgb.r, lrgb.g, lrgb.b);
   } else {
     rgb_matrix_set_color(0, RGB_OFF);
-    rgb_matrix_set_color(36, RGB_OFF);
- } 
-
-  rgb_t lrgb = hsv_to_rgb(layer_color_hsv);
+  }
 
   for (uint8_t row = 0; row < MATRIX_ROWS; ++row) {
     for (uint8_t col = 0; col < MATRIX_COLS; ++col) {
@@ -354,4 +372,4 @@ bool oled_task_user(void) {
   return false;
 }
 
-#endif //OLED_ENABLEM
+#endif //OLED_ENABLE

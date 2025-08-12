@@ -29,7 +29,9 @@
 
 #define TAPPING_TERM 300
 
-#define OLED_FONT_H "font.c"
+#define CAPS_WORD_INVERT_ON_SHIFT
+
+//#define OLED_FONT_H "font.c"
 
 // space saving
 #define LAYER_STATE_8BIT
