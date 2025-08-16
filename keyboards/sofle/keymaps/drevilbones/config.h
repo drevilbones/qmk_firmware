@@ -34,7 +34,7 @@
 //#define OLED_FONT_H "font.c"
 
 // space saving
-#define LAYER_STATE_8BIT
+//#define LAYER_STATE_8BIT
 #define NO_ACTION_ONESHOT
 #undef LOCKING_SUPPORT_ENABLE
 #undef LOCKING_RESYNC_ENABLE

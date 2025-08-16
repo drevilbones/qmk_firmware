@@ -41,10 +41,11 @@ enum my_keycodes {
 #define CT_RGHT RCTL(KC_RGHT)
 
 // default layer color: dull cyan
-#define HSV_DEF 128, 255, 75
+#define HSV_DEF 128, 255, 100
 
 static uint16_t blink_timer;
 bool caps_indicator;
+uint8_t held_keys[6];
 
 
 enum layer_names {
@@ -67,7 +68,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
                     KC_LBRC, KC_RBRC, MO(FUNC),MO(NAVI),KC_ENT,  MO(NAVI),KC_SPC, MO(FUNC),KC_MINS, KC_EQL
 ),
 
-[GAME] = LAYOUT(//game (disable tap-hold keys
+[GAME] = LAYOUT(//game (disable tap-hold keys)
   KC_ESC,   KC_1,   KC_2,    KC_3,    KC_4,    KC_5,                      KC_6,    KC_7,   KC_8,    KC_9,    KC_0,    KC_BSPC,
   KC_TAB,   KC_Q,   KC_W,    KC_E,    KC_R,    KC_T,                      KC_Y,    KC_U,   KC_I,    KC_O,    KC_P,    KC_BSLS,
   KC_LCTL,  KC_A,   KC_S,    KC_D,    KC_F,    KC_G,                      KC_H,    KC_J,   KC_K,    KC_L,    KC_SCLN, KC_QUOT,
@@ -80,7 +81,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   KC_TAB,   KC_T,   KC_Q,    KC_W,    KC_E,    KC_R,                      KC_Y,    KC_U,   KC_I,    KC_O,    KC_P,    KC_BSLS,
   KC_LCTL,  KC_G,   KC_A,    KC_S,    KC_D,    KC_F,                      KC_H,    KC_J,   KC_K,    KC_L,    KC_SCLN, KC_QUOT,
   KC_LSFT,  KC_B,   KC_Z,    KC_X,    KC_C,    KC_V,  _______,   _______, KC_N,    KC_M,   KC_COMM, KC_DOT,  KC_SLSH, KC_RSFT,
-                    KC_I,    KC_M,   MO(FUNC), KC_LALT,KC_SPC,   MO(NAVI),KC_ENT,  MO(FUNC),KC_MINS,KC_EQL 
+                    KC_I,    KC_M,   MO(FUNC), KC_LALT,KC_SPC,   MO(NAVI),KC_ENT, MO(FUNC),KC_MINS, KC_EQL 
 ),
 
 [NAVI] = LAYOUT( //navigation
@@ -96,7 +97,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   _______, _______, _______, _______, _______, _______,                   _______, _______, _______, _______, _______, KC_F12,
   _______, _______, _______, _______, _______, _______,                   _______, _______, _______, _______, _______, _______,
   CW_TOGG, _______, _______, _______, _______, _______, _______, _______, _______, _______, KC_MPRV, KC_MNXT, _______, KC_CAPS,
-                    _______, _______,TG(GAME),_______, KC_MPLY,  KC_MPLY, _______, TG(FPS), _______, TG(NUMP)
+                    _______, _______,TG(GAME), _______, KC_MPLY, KC_MPLY, _______, TG(FPS), _______, TG(NUMP)
 ),
 
 [NUMP] = LAYOUT( //Numpad
@@ -175,7 +176,7 @@ void keyboard_post_init_user(void) {
 
 
 void housekeeping_task_user(void) {
-  if (host_keyboard_led_state().caps_lock && timer_elapsed(blink_timer) > 150) {
+  if (host_keyboard_led_state().caps_lock && timer_elapsed(blink_timer) > 50) {
     blink_timer = timer_read();
     caps_indicator = !caps_indicator;
   } else if (!host_keyboard_led_state().caps_lock) {
@@ -212,6 +213,16 @@ bool encoder_update_user(uint8_t index, bool clockwise) {
 }
 
 
+//bool is_held(uint8_t index) {
+//  for (uint8_t i = 0; i < 6; i++) {
+//    if (held_keys[i] == index) {
+//      return true;
+//    }
+//    return false;
+//  }
+//}
+
+
 // index 0 (and 36?): indicator LEDs
 bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
   hsv_t layer_color_hsv = (hsv_t){HSV_DEF};
@@ -224,8 +235,8 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
       rgb_matrix_sethsv_noeeprom(HSV_RED);
       break;
     case GAME: //game
-      layer_color_hsv = (hsv_t){HSV_YELLOW};
-      rgb_matrix_sethsv_noeeprom(HSV_YELLOW);
+      layer_color_hsv = (hsv_t){HSV_BLUE};
+      rgb_matrix_sethsv_noeeprom(HSV_BLUE);
       break;
     case NAVI: // nav
       layer_color_hsv = (hsv_t){HSV_GREEN};
@@ -264,6 +275,7 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
         uint16_t kcatkml = keycode_at_keymap_location(layer, row, col);
         if (index >= led_min && index < led_max && index != NO_LED) {
           if (kcatkml == XXXXXXX) { rgb_matrix_set_color(index, RGB_OFF); } // if the key isn't active, turn LED off
+          //else if (is_key_locked(&kcatkml)) { rgb_matrix_set_color(index, RGB_BLUE); } //if it's being held by QK_LOCK... TODO
           else if (kcatkml == KC_TRNS) { /* do nothing, just let it be the default color */ }
           else { rgb_matrix_set_color(index, lrgb.r, lrgb.g, lrgb.b); } // else make it the right color
         }
