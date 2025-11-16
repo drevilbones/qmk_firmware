@@ -40,6 +40,9 @@ enum my_keycodes {
 #define CT_LEFT LCTL(KC_LEFT)
 #define CT_RGHT RCTL(KC_RGHT)
 
+// shift+insert for linux clipboard paste
+#define SH_INS LSFT(KC_INS)
+
 // default layer color: dull cyan
 #define HSV_DEF 128, 255, 100
 
@@ -86,15 +89,15 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
 [NAVI] = LAYOUT( //navigation
   _______, _______, _______, _______, _______, _______,                   _______, _______, _______, _______, _______,  KC_DEL,
-  _______, _______, KC_PGUP, _______, _______, _______,                   CT_LEFT, _______, _______, CT_RGHT, _______, _______,
-  _______, KC_HOME, KC_PGDN, KC_END,  _______, _______,                   KC_LEFT, KC_DOWN, KC_UP,   KC_RGHT, _______, _______,
+  _______, _______, _______, KC_PGUP, _______, _______,                   CT_LEFT, _______, _______, CT_RGHT, _______, _______,
+  _______, _______, KC_HOME, KC_PGDN,  KC_END, _______,                   KC_LEFT, KC_DOWN, KC_UP,   KC_RGHT, _______, _______,
   QK_LOCK, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, QK_LOCK,
                     _______, _______, _______, _______, _______, _______, _______, _______, _______, _______
 ),
 
 [FUNC] = LAYOUT( //function
   _______, KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,                       KC_F6,   KC_F7,   KC_F8,   KC_F9,  KC_F10, KC_F11,  
-  _______, _______, _______, _______, _______, _______,                   _______, _______, _______, _______, _______, KC_F12,
+  _______, _______, _______, _______, _______, _______,                   _______, _______, SH_INS,  _______, _______, KC_F12,
   _______, _______, _______, _______, _______, _______,                   KC_MRWD, _______, _______, KC_MFFD, _______, _______,
   CW_TOGG, _______, _______, _______, _______, _______, KC_MUTE, _______, _______, _______, KC_MPRV, KC_MNXT, _______, KC_CAPS,
                     _______, _______,TG(GAME), _______, KC_MPLY, KC_MPLY, _______, TG(FPS), _______, TG(NUMP)
