@@ -43,8 +43,6 @@ enum my_keycodes {
 // shift+insert for linux clipboard paste
 #define SH_INS LSFT(KC_INS)
 
-// default layer color: dull cyan
-#define HSV_DEF 128, 255, 100
 
 static uint16_t blink_timer;
 bool caps_indicator;
@@ -131,7 +129,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
 };
 
-
+#ifdef POINTING_DEVICE_ENABLE
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
   switch (keycode) {
     case MB1HLD:
@@ -170,13 +168,16 @@ void pointing_device_init_user(void) {
   set_auto_mouse_layer(MAUS);
 }
 
+#endif // POINTING_DEVICE_ENABLE
 
 void keyboard_post_init_user(void) {
-  rgb_matrix_sethsv(HSV_DEF);
   blink_timer = timer_read();
   caps_indicator = false;
+  debug_enable = true;
+  //debug_matrix = true;
+  debug_keyboard = true;
+  debug_mouse = true;
 }
-
 
 void housekeeping_task_user(void) {
   if (host_keyboard_led_state().caps_lock && timer_elapsed(blink_timer) > 50) {
@@ -187,7 +188,7 @@ void housekeeping_task_user(void) {
   }
 }
 
-
+#ifdef ENCODER_ENABLE
 bool encoder_update_user(uint8_t index, bool clockwise) {
   switch(get_highest_layer(layer_state)) {
     case NAVI:
@@ -214,92 +215,7 @@ bool encoder_update_user(uint8_t index, bool clockwise) {
   }
   return false;
 }
-
-
-//bool is_held(uint8_t index) {
-//  for (uint8_t i = 0; i < 6; i++) {
-//    if (held_keys[i] == index) {
-//      return true;
-//    }
-//    return false;
-//  }
-//}
-
-
-// index 0 (and 36?): indicator LEDs
-bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
-  hsv_t layer_color_hsv = (hsv_t){HSV_DEF};
-  bool mouse_indicator = false;
-  bool num_indicator = false;
-  uint8_t layer = get_highest_layer(layer_state);
-  switch(layer) {
-    case FPS: //fps
-      layer_color_hsv = (hsv_t){HSV_RED};
-      rgb_matrix_sethsv_noeeprom(HSV_RED);
-      break;
-    case GAME: //game
-      layer_color_hsv = (hsv_t){HSV_BLUE};
-      rgb_matrix_sethsv_noeeprom(HSV_BLUE);
-      break;
-    case NAVI: // nav
-      layer_color_hsv = (hsv_t){HSV_GREEN};
-      break;
-    case FUNC: //func
-      layer_color_hsv = (hsv_t){HSV_ORANGE};
-      break;
-    case MAUS: //mouse
-      mouse_indicator = true;
-      layer_color_hsv = (hsv_t){HSV_WHITE};
-      break;
-    case NUMP: //numpad
-      layer_color_hsv = (hsv_t){HSV_PURPLE};
-      break;
-    default:
-      rgb_matrix_sethsv_noeeprom(HSV_DEF);
-      break;      
-  }
-
-  rgb_t lrgb = hsv_to_rgb(layer_color_hsv);
-
-  num_indicator = (host_keyboard_led_state().num_lock && layer == NUMP); 
-
-  if (caps_indicator || is_caps_word_on()) {
-    rgb_matrix_set_color(0, RGB_RED);
-  } else if (mouse_indicator || num_indicator) {
-    rgb_matrix_set_color(0, lrgb.r, lrgb.g, lrgb.b);
-  } else {
-    rgb_matrix_set_color(0, RGB_OFF);
-  }
-
-  for (uint8_t row = 0; row < MATRIX_ROWS; ++row) {
-    for (uint8_t col = 0; col < MATRIX_COLS; ++col) {
-        uint8_t index = g_led_config.matrix_co[row][col];
-
-        uint16_t kcatkml = keycode_at_keymap_location(layer, row, col);
-        if (index >= led_min && index < led_max && index != NO_LED) {
-          if (kcatkml == XXXXXXX) { rgb_matrix_set_color(index, RGB_OFF); } // if the key isn't active, turn LED off
-          //else if (is_key_locked(&kcatkml)) { rgb_matrix_set_color(index, RGB_BLUE); } //if it's being held by QK_LOCK... TODO
-          else if (kcatkml == KC_TRNS) { /* do nothing, just let it be the default color */ }
-          else { rgb_matrix_set_color(index, lrgb.r, lrgb.g, lrgb.b); } // else make it the right color
-        }
-    }
-  }
-  return false;
-}
-
-
-// space saving
-#ifndef MAGIC_ENABLE
-uint16_t keycode_config(uint16_t keycode) {
-    return keycode;
-}
-#endif
-#ifndef MAGIC_ENABLE
-uint8_t mod_config(uint8_t mod) {
-    return mod;
-}
-#endif
-
+#endif // ENCODER_ENABLE
 
 #ifdef OLED_ENABLE
 oled_rotation_t oled_init_user(oled_rotation_t rotation) { return OLED_ROTATION_270; }
@@ -379,12 +295,13 @@ void print_caps(void) {
 
 
 bool oled_task_user(void) {
-  if (is_keyboard_left()) {
-    print_caps();
-  } else {
-    print_layer();
-  }
+  //if (is_keyboard_left()) {
+  //  print_caps();
+  //} else {
+  //  print_layer();
+  //}
+  print_layer();
   return false;
 }
 
-#endif //OLED_ENABLE
+#endif // OLED_ENABLE
