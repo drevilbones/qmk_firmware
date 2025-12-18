@@ -6,10 +6,11 @@
         "cols": ["GP4"],
         "rows": ["GP5"]
     },
-    "backlight": {
-        "pin": "GP25"
-    },
-    "ws2812": {
-        "pin": "GP25"
-    }
+    "ps2": {
+        "clock_pin": "GP1",
+        "data_pin": "GP0",
+        "driver": "vendor",
+        "enabled": true,
+        "mouse_enabled": true
+    }    
 }

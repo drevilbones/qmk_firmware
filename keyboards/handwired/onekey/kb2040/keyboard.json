@@ -10,6 +10,13 @@
         "driver": "vendor"
     },
     "features": {
-        "oled": true
+        "oled": false
+    },
+    "ps2": {
+        "clock_pin": "GP3",
+        "data_pin": "GP2",
+        "driver": "vendor",
+        "enabled": true,
+        "mouse_enabled": true
     }
 }
