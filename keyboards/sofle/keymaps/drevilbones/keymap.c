@@ -14,7 +14,7 @@
   * You should have received a copy of the GNU General Public License
   * along with this program.  If not, see <http://www.gnu.org/licenses/>.
   */
-  // SOFLE RGB
+  // SOFLE SOLDERED
 #include <stdio.h>
 #include "keymap_introspection.h"
 #include QMK_KEYBOARD_H
@@ -56,7 +56,6 @@ enum layer_names {
   NAVI,
   FUNC,
   NUMP,
-  MAUS,
 };
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -107,8 +106,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                   XXXXXXX, KC_P1,   KC_P2,   KC_P3,   XXXXXXX, XXXXXXX,
   XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, _______, _______, KC_NUM,  KC_P0,   KC_PEQL, KC_PDOT, KC_PSLS, KC_ENT,
                     XXXXXXX, XXXXXXX, TG(NUMP),KC_SPC , _______, XXXXXXX, _______, KC_PENT, KC_PMNS, KC_PPLS
-),
+)
 
+/*
 [MAUS] = LAYOUT( //mouse
   _______, _______, _______, _______, _______, _______,                   _______, _______, _______, _______, _______, _______,
   _______, _______, MS_BTN2, MS_BTN3, MS_BTN1, MB1HLD,                    _______, _______, _______, _______, _______, _______,
@@ -260,10 +260,6 @@ void print_layer(void) {
         oled_set_cursor(0, 10);
         oled_write_P(PSTR("FUNC\xB3"), false);
         break;
-      case MAUS:
-        oled_set_cursor(0, 8);
-        oled_write_P(PSTR("MAUS\xB3"), false);
-        break;
       case NUMP:
         oled_set_cursor(0, 6);
         oled_write_P(PSTR("NUMP\xB3"), false);
@@ -295,12 +291,11 @@ void print_caps(void) {
 
 
 bool oled_task_user(void) {
-  //if (is_keyboard_left()) {
-  //  print_caps();
-  //} else {
-  //  print_layer();
-  //}
-  print_layer();
+  if (is_keyboard_left()) {
+    print_caps();
+  } else {
+    print_layer();
+  }
   return false;
 }
 
