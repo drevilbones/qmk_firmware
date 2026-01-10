@@ -64,7 +64,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   KC_ESC,   KC_1,   KC_2,    KC_3,    KC_4,    KC_5,                      KC_6,    KC_7,   KC_8,    KC_9,    KC_0,    KC_BSPC,
   KC_TAB,   KC_Q,   KC_W,    KC_E,    KC_R,    KC_T,                      KC_Y,    KC_U,   KC_I,    KC_O,    KC_P,    KC_BSLS,
   KC_GRV,   KC_A,   MT_S,    MT_D,    MT_F,    KC_G,                      KC_H,    MT_J,   MT_K,    MT_L,    KC_SCLN, KC_QUOT,
-  KC_LSFT,  KC_Z,   KC_X,    KC_C,    KC_V,    KC_B,  _______,   _______, KC_N,    KC_M,   KC_COMM, KC_DOT,  KC_SLSH, KC_RSFT,
+  KC_LSFT,  KC_Z,   KC_X,    KC_C,    KC_V,    KC_B,  MS_BTN1,   MS_BTN2, KC_N,    KC_M,   KC_COMM, KC_DOT,  KC_SLSH, KC_RSFT,
                     KC_LBRC, KC_RBRC, MO(FUNC),MO(NAVI),KC_ENT,  MO(NAVI),KC_SPC, MO(FUNC),KC_MINS, KC_EQL
 ),
 
@@ -117,7 +117,6 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
                     _______, _______, _______, _______, _______, _______, _______, _______, _______, _______
 )
 
-/*
 [8] = LAYOUT(
   _______, _______, _______, _______, _______, _______,                   _______, _______, _______, _______, _______, _______,
   _______, _______, _______, _______, _______, _______,                   _______, _______, _______, _______, _______, _______,
@@ -192,10 +191,18 @@ void housekeeping_task_user(void) {
 bool encoder_update_user(uint8_t index, bool clockwise) {
   switch(get_highest_layer(layer_state)) {
     case NAVI:
-      if (clockwise) {
-        tap_code(MS_WHLR);
+      if (index == 0) {
+        if (clockwise) {
+          tap_code(MS_WHLD);
+        } else {
+          tap_code(MS_WHLU);
+        }
       } else {
-        tap_code(MS_WHLL);
+        if (clockwise) {
+          tap_code(MS_WHLR);
+        } else {
+          tap_code(MS_WHLL);
+        }
       }
       break;
     case GAME:
@@ -207,10 +214,18 @@ bool encoder_update_user(uint8_t index, bool clockwise) {
       }
       break;
     default:
-      if (clockwise) {
-        tap_code(MS_WHLD);
+      if (index == 0) {
+        if (clockwise) {
+          tap_code(MS_DOWN);
+        } else {
+          tap_code(MS_UP);
+        }
       } else {
-        tap_code(MS_WHLU);
+         if (clockwise) {
+          tap_code(MS_LEFT);
+        } else {
+          tap_code(MS_RGHT);
+        }       
       }
   }
   return false;
