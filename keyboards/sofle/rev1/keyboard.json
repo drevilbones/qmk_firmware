@@ -2,25 +2,25 @@
     "manufacturer": "JosefAdamcik",
     "url": "https://github.com/josefadamcik/SofleKeyboard",
     "maintainer": "Josef Adamcik <josef.adamcik@gmail.com>",
-    "development_board": "kb2040",
+    "development_board": "promicro",
     "usb": {
         "pid": "0x0287",
         "device_version": "0.0.1"
     },
     "matrix_pins": {
-        "cols": ["GP27", "GP26", "GP18", "GP20", "GP19", "GP10"],
-        "rows": ["GP5", "GP6", "GP7", "GP8", "GP9"]
+        "cols": ["F6", "F7", "B1", "B3", "B2", "B6"],
+        "rows": ["C6", "D7", "E6", "B4", "B5"]
     },
     "encoder": {
         "rotary": [
-            {"pin_a": "GP28", "pin_b": "GP29", "resolution": 2}
+            {"pin_a": "F5", "pin_b": "F4", "resolution": 2}
         ]
     },
     "split": {
         "encoder": {
             "right": {
                 "rotary": [
-                    {"pin_a": "GP29", "pin_b": "GP28", "resolution": 2}
+                    {"pin_a": "F4", "pin_b": "F5", "resolution": 2}
                 ]
             }
         }

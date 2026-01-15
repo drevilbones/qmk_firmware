@@ -45,15 +45,13 @@ enum my_keycodes {
 
 
 static uint16_t blink_timer;
-bool caps_indicator;
-uint8_t held_keys[6];
-
+static bool caps_indicator;
 
 enum layer_names {
   BASE,
   GAME,
   FPS,
-  NAVI,
+  NAV,
   FUNC,
   NUMP,
 };
@@ -65,7 +63,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   KC_TAB,   KC_Q,   KC_W,    KC_E,    KC_R,    KC_T,                      KC_Y,    KC_U,   KC_I,    KC_O,    KC_P,    KC_BSLS,
   KC_GRV,   KC_A,   MT_S,    MT_D,    MT_F,    KC_G,                      KC_H,    MT_J,   MT_K,    MT_L,    KC_SCLN, KC_QUOT,
   KC_LSFT,  KC_Z,   KC_X,    KC_C,    KC_V,    KC_B,  MS_BTN1,   MS_BTN2, KC_N,    KC_M,   KC_COMM, KC_DOT,  KC_SLSH, KC_RSFT,
-                    KC_LBRC, KC_RBRC, MO(FUNC),MO(NAVI),KC_ENT,  MO(NAVI),KC_SPC, MO(FUNC),KC_MINS, KC_EQL
+                    KC_LBRC, KC_RBRC, MO(FUNC),MO(NAV),KC_ENT,   MO(NAV), KC_SPC, MO(FUNC),KC_MINS, KC_EQL
 ),
 
 [GAME] = LAYOUT(//game (disable tap-hold keys)
@@ -73,7 +71,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   KC_TAB,   KC_Q,   KC_W,    KC_E,    KC_R,    KC_T,                      KC_Y,    KC_U,   KC_I,    KC_O,    KC_P,    KC_BSLS,
   KC_LCTL,  KC_A,   KC_S,    KC_D,    KC_F,    KC_G,                      KC_H,    KC_J,   KC_K,    KC_L,    KC_SCLN, KC_QUOT,
   KC_LSFT,  KC_Z,   KC_X,    KC_C,    KC_V,    KC_B, _______,    _______, KC_N,    KC_M,   KC_COMM, KC_DOT,  KC_SLSH, KC_RSFT,
-                    KC_I,    KC_M,   MO(FUNC),KC_LALT,KC_SPC,   MO(NAVI), KC_ENT, MO(FUNC),KC_MINS, KC_EQL 
+                    KC_I,    KC_M,   MO(FUNC),KC_LALT,KC_SPC,    MO(NAV), KC_ENT, MO(FUNC),KC_MINS, KC_EQL 
 ),
 
 [FPS] = LAYOUT( //fps (disabling the tap-hold keys and shifting a column to turn wasd into esdf)
@@ -81,10 +79,10 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   KC_TAB,   KC_T,   KC_Q,    KC_W,    KC_E,    KC_R,                      KC_Y,    KC_U,   KC_I,    KC_O,    KC_P,    KC_BSLS,
   KC_LCTL,  KC_G,   KC_A,    KC_S,    KC_D,    KC_F,                      KC_H,    KC_J,   KC_K,    KC_L,    KC_SCLN, KC_QUOT,
   KC_LSFT,  KC_B,   KC_Z,    KC_X,    KC_C,    KC_V,  _______,   _______, KC_N,    KC_M,   KC_COMM, KC_DOT,  KC_SLSH, KC_RSFT,
-                    KC_I,    KC_M,   MO(FUNC), KC_LALT,KC_SPC,   MO(NAVI),KC_ENT, MO(FUNC),KC_MINS, KC_EQL 
+                    KC_I,    KC_M,   MO(FUNC), KC_LALT,KC_SPC,   MO(NAV), KC_ENT, MO(FUNC),KC_MINS, KC_EQL 
 ),
 
-[NAVI] = LAYOUT( //navigation
+[NAV] = LAYOUT( //navigation
   _______, _______, _______, _______, _______, _______,                   _______, _______, _______, _______, _______,  KC_DEL,
   _______, _______, _______, KC_PGUP, _______, _______,                   CT_LEFT, _______, _______, CT_RGHT, _______, _______,
   _______, _______, KC_HOME, KC_PGDN,  KC_END, _______,                   KC_LEFT, KC_DOWN, KC_UP,   KC_RGHT, _______, _______,
@@ -170,28 +168,51 @@ void pointing_device_init_user(void) {
 #endif // POINTING_DEVICE_ENABLE
 
 void keyboard_post_init_user(void) {
+  // console debug setup
+  debug_enable = true;
+  debug_keyboard = true;
+  debug_mouse = false;
+
+  // annoying caps notification variables
   blink_timer = timer_read();
   caps_indicator = false;
-  debug_enable = true;
-  //debug_matrix = true;
-  debug_keyboard = true;
-  debug_mouse = true;
 }
 
 void housekeeping_task_user(void) {
-  if (host_keyboard_led_state().caps_lock && timer_elapsed(blink_timer) > 50) {
-    blink_timer = timer_read();
-    caps_indicator = !caps_indicator;
-  } else if (!host_keyboard_led_state().caps_lock) {
+  if (host_keyboard_led_state().caps_lock || is_caps_word_on()) {
+    if (timer_elapsed(blink_timer) > 100) {
+      blink_timer = timer_read();
+      caps_indicator = !caps_indicator;
+    }
+  } else {
     caps_indicator = false;
   }
 }
 
 #ifdef ENCODER_ENABLE
+
+static uint8_t tth_keycode[2];
+static deferred_token tth_token = INVALID_DEFERRED_TOKEN;
+
+static uint32_t tth_timer(uint32_t trigger_time, void* nuthin) {
+  unregister_code(tth_keycode[0]); // this is real hacky :P
+  unregister_code(tth_keycode[1]);
+  return 0;
+}
+
+#define TTH_DELAY 250
+void tap_to_hold(uint8_t keycode, uint8_t index) {
+  tth_keycode[index] = keycode;
+  register_code(keycode);
+  if (!extend_deferred_exec(tth_token, TTH_DELAY)) {
+    tth_token = defer_exec(TTH_DELAY, tth_timer, NULL);
+  }
+}
+
 bool encoder_update_user(uint8_t index, bool clockwise) {
   switch(get_highest_layer(layer_state)) {
-    case NAVI:
-      if (index == 0) {
+    case NAV:
+      if (index == 1) {
         if (clockwise) {
           tap_code(MS_WHLD);
         } else {
@@ -199,118 +220,120 @@ bool encoder_update_user(uint8_t index, bool clockwise) {
         }
       } else {
         if (clockwise) {
-          tap_code(MS_WHLR);
-        } else {
           tap_code(MS_WHLL);
+        } else {
+          tap_code(MS_WHLR);
         }
       }
       break;
     case GAME:
+    case FPS:
     case FUNC:
       if (clockwise) {
-        tap_code(KC_VOLU);
-      } else {
         tap_code(KC_VOLD);
+      } else {
+        tap_code(KC_VOLU);
       }
       break;
     default:
-      if (index == 0) {
+      if (index == 1) {
         if (clockwise) {
-          tap_code(MS_DOWN);
+          tap_to_hold(MS_DOWN, index);
         } else {
-          tap_code(MS_UP);
+          tap_to_hold(MS_UP, index);
         }
       } else {
          if (clockwise) {
-          tap_code(MS_LEFT);
+          tap_to_hold(MS_LEFT, index);
         } else {
-          tap_code(MS_RGHT);
+          tap_to_hold(MS_RGHT, index);
         }       
       }
   }
   return false;
 }
+
+
 #endif // ENCODER_ENABLE
 
 #ifdef OLED_ENABLE
-oled_rotation_t oled_init_user(oled_rotation_t rotation) { return OLED_ROTATION_270; }
+oled_rotation_t oled_init_user(oled_rotation_t rotation) { 
+  if (!is_keyboard_left()){ return OLED_ROTATION_270; }
 
-void print_layer(void) {
-  oled_set_cursor(0, 0);
-  oled_write_P(PSTR("Layer"), false);
+  return rotation;
+}
+
+
+void print_status(void) {
+  oled_set_cursor(0, 4);
+  oled_write("Layer", false);
 
   uint8_t i;
-  for (i = 5; i < 14; i++) {
+  for (i = 5; i < 12; i++) {
     oled_set_cursor(0, i);
-    if (i == 13 || i == 11 || i == 9 || i == 7) {
-      oled_write_P(PSTR("\xAD\xCD\xCD\xCD\xB5"), false);
-    } else if (i == 5) {
-      oled_write_P(PSTR("\xAD\xCD\xCD\xCD\xB8"), false);
-    } else {
-      oled_write_ln_P(PSTR("    \xB3"), false);
+    if (i == 5) { // on the first row, draw a pipe connecting down at the end
+      oled_write("\xAD\xCD\xCD\xCD\xB8", false);
+    } else if (i % 2) { // on other odd numbered rows, draw a pipe connecting up & down
+      oled_write("\xAD\xCD\xCD\xCD\xB5", false);
+    } else { // otherwise, just draw a pipe at the end
+      oled_write_ln("    \xB3", false);
     }
   }
+
+  if (caps_indicator) {
+    oled_set_cursor(0,0);
+    oled_write("CAPS!", true);
+  } else {
+    oled_set_cursor(0,0);
+    oled_write("     ", false);
+  }
   
-  oled_set_cursor(0, 15);
-  oled_write_P(PSTR("\xAD\xCD\xCD\xCD\xBE"), false);
+  oled_set_cursor(0, 13); // draw the final pipe at the bottom
+  oled_write("\xAD\xCD\xCD\xCD\xBE", false);
 
   switch (get_highest_layer(layer_state)) {
       case BASE:
-        oled_set_cursor(0, 14); 
-        oled_write_P(PSTR("BASE\xB3"), false);
+        oled_set_cursor(0, 12); 
+        oled_write("BASE\xB3", false);
         break;        
       case GAME:
-        oled_set_cursor(0, 14); 
-        oled_write_P(PSTR("GAME\xB3"), false);
+        oled_set_cursor(0, 12); 
+        oled_write("GAME\xB3", false);
         break;
       case FPS:
-        oled_set_cursor(0, 14); 
-        oled_write_P(PSTR("FPS \xB3"), false);
+        oled_set_cursor(0, 12); 
+        oled_write("FPS \xB3", false);
         break;       
-      case NAVI:
-        oled_set_cursor(0, 12);
-        oled_write_P(PSTR("NAVI\xB3"), false);
+      case NAV:
+        oled_set_cursor(0, 10);
+        oled_write("NAV \xB3", false);
         break;
       case FUNC:
-        oled_set_cursor(0, 10);
-        oled_write_P(PSTR("FUNC\xB3"), false);
+        oled_set_cursor(0, 8);
+        oled_write("FUNC\xB3", false);
         break;
       case NUMP:
         oled_set_cursor(0, 6);
-        oled_write_P(PSTR("NUMP\xB3"), false);
+        oled_write("NUMP\xB3", false);
         break;
       default:
-        oled_write_ln_P(PSTR("something is broken in layers"), false);
+        oled_write_ln("something is broken in layers", false);
   }
 }
 
 
 void print_caps(void) {
-    led_t led_usb_state = host_keyboard_led_state();
-    if (led_usb_state.caps_lock) {
-      oled_set_cursor(0, 0);
-      oled_write_P(PSTR("CAP"), false);
-    } else {
-      oled_set_cursor(0, 0);
-      oled_write_P(PSTR("   "), false);
-    }
-
-    if (led_usb_state.num_lock) {
-      oled_set_cursor(0, 6); 
-      oled_write_P(PSTR("NUM"), false);
-    } else {
-      oled_set_cursor(0, 6);
-      oled_write_P(PSTR("   "), false);
-    }
+  oled_write("left!", false);
 }
 
 
 bool oled_task_user(void) {
-  if (is_keyboard_left()) {
-    print_caps();
-  } else {
-    print_layer();
-  }
+  //if (is_keyboard_left()) {
+  //  print_caps();
+  //} else {
+  //  print_layer();
+  //}
+  print_status();
   return false;
 }
 
