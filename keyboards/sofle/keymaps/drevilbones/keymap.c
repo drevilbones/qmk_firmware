@@ -51,10 +51,15 @@ enum layer_names {
   BASE,
   GAME,
   FPS,
+  TYPE,
   NAV,
   FUNC,
   NUMP,
   ETCH,
+};
+
+enum custom_keycodes {
+    C_TYP = SAFE_RANGE,
 };
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -67,17 +72,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
                     KC_LBRC, KC_RBRC, MO(FUNC),MO(NAV),KC_ENT,   MO(NAV), KC_SPC, MO(FUNC),KC_MINS, KC_EQL
 ),
 
-[TYPE] = LAYOUT(//temporary typing layer for the two below game layers, swaps back on ENT TODO
-  KC_ESC,   KC_1,   KC_2,    KC_3,    KC_4,    KC_5,                      KC_6,    KC_7,   KC_8,    KC_9,    KC_0,    KC_BSPC,
-  KC_TAB,   KC_Q,   KC_W,    KC_E,    KC_R,    KC_T,                      KC_Y,    KC_U,   KC_I,    KC_O,    KC_P,    KC_BSLS,
-  KC_LCTL,  KC_A,   KC_S,    KC_D,    KC_F,    KC_G,                      KC_H,    KC_J,   KC_K,    KC_L,    KC_SCLN, KC_QUOT,
-  KC_LSFT,  KC_Z,   KC_X,    KC_C,    KC_V,    KC_B, _______,    _______, KC_N,    KC_M,   KC_COMM, KC_DOT,  KC_SLSH, KC_RSFT,
-                    KC_I,    KC_M,   MO(FUNC),KC_LALT,KC_SPC,    MO(NAV), KC_ENT, TG(GAME),KC_MINS, KC_EQL 
-),
-
 [GAME] = LAYOUT(//game (disable tap-hold keys, swap spc & enter)
   KC_ESC,   KC_1,   KC_2,    KC_3,    KC_4,    KC_5,                      KC_6,    KC_7,   KC_8,    KC_9,    KC_0,    KC_BSPC,
-  KC_TAB,   KC_Q,   KC_W,    KC_E,    KC_R,    KC_T,                      KC_Y,    KC_U,   KC_I,    KC_O,    KC_P,    KC_BSLS,
+  KC_TAB,   KC_Q,   KC_W,    KC_E,    KC_R,    KC_T,                      KC_Y,    KC_U,   KC_I,    KC_O,    KC_P,    TG(TYPE),
   KC_LCTL,  KC_A,   KC_S,    KC_D,    KC_F,    KC_G,                      KC_H,    KC_J,   KC_K,    KC_L,    KC_SCLN, KC_QUOT,
   KC_LSFT,  KC_Z,   KC_X,    KC_C,    KC_V,    KC_B, _______,    _______, KC_N,    KC_M,   KC_COMM, KC_DOT,  KC_SLSH, KC_RSFT,
                     KC_I,    KC_M,   MO(FUNC),KC_LALT,KC_SPC,    MO(NAV), KC_ENT, TG(GAME),KC_MINS, KC_EQL 
@@ -85,10 +82,18 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
 [FPS] = LAYOUT( //fps (GAME but also shifting a column on the left hand to turn wasd into esdf)
   KC_ESC,   KC_1,   KC_2,    KC_3,    KC_4,    KC_5,                      KC_6,    KC_7,   KC_8,    KC_9,    KC_0,    KC_BSPC,
-  KC_TAB,   KC_T,   KC_Q,    KC_W,    KC_E,    KC_R,                      KC_Y,    KC_U,   KC_I,    KC_O,    KC_P,    KC_BSLS,
+  KC_TAB,   KC_T,   KC_Q,    KC_W,    KC_E,    KC_R,                      KC_Y,    KC_U,   KC_I,    KC_O,    KC_P,    TG(TYPE),
   KC_LCTL,  KC_G,   KC_A,    KC_S,    KC_D,    KC_F,                      KC_H,    KC_J,   KC_K,    KC_L,    KC_SCLN, KC_QUOT,
   KC_LSFT,  KC_B,   KC_Z,    KC_X,    KC_C,    KC_V,  _______,   _______, KC_N,    KC_M,   KC_COMM, KC_DOT,  KC_SLSH, KC_RSFT,
                     KC_I,    KC_M,   MO(FUNC), KC_LALT,KC_SPC,   MO(NAV), KC_ENT, TG(FPS), KC_MINS, KC_EQL 
+),
+
+[TYPE] = LAYOUT(//temporary typing layer for the two game layers, swaps back on ENT
+  KC_ESC,   KC_1,   KC_2,    KC_3,    KC_4,    KC_5,                      KC_6,    KC_7,   KC_8,    KC_9,    KC_0,    KC_BSPC,
+  KC_TAB,   KC_Q,   KC_W,    KC_E,    KC_R,    KC_T,                      KC_Y,    KC_U,   KC_I,    KC_O,    KC_P,    TG(TYPE),
+  KC_LCTL,  KC_A,   KC_S,    KC_D,    KC_F,    KC_G,                      KC_H,    KC_J,   KC_K,    KC_L,    KC_SCLN, KC_QUOT,
+  KC_LSFT,  KC_Z,   KC_X,    KC_C,    KC_V,    KC_B, _______,    _______, KC_N,    KC_M,   KC_COMM, KC_DOT,  KC_SLSH, KC_RSFT,
+                    KC_LBRC, KC_RBRC, MO(FUNC),KC_LALT, C_TYP,   MO(NAV), KC_SPC, MO(FUNC),KC_MINS, KC_EQL 
 ),
 
 [NAV] = LAYOUT( //navigation
@@ -127,16 +132,24 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
 };
 
-#ifdef POINTING_DEVICE_ENABLE
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
   switch (keycode) {
+    #ifdef POINTING_DEVICE_ENABLE
     case MB1HLD:
+      return false;
+    #endif // POINTING_DEVICE_ENABLE
+    case C_TYP:
+      if (record->event.pressed) {
+        SEND_STRING(SS_TAP(X_ENT));
+        layer_off(TYPE);
+      }
       return false;
     default:
       return true;
   }
 }
 
+#ifdef POINTING_DEVICE_ENABLE
 
 bool mb1held = false;
 bool is_mouse_record_user(uint16_t keycode, keyrecord_t* record) {
@@ -270,7 +283,11 @@ void print_status(void) {
       case FPS:
         oled_set_cursor(0, 12); 
         oled_write("FPS \xB3", false);
-        break;       
+        break;
+      case TYPE:
+        oled_set_cursor(0, 12); 
+        oled_write("TYPE\xB3", false);
+        break;
       case NAV:
         oled_set_cursor(0, 10);
         oled_write("NAV \xB3", false);
