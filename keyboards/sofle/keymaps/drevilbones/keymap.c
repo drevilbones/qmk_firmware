@@ -54,6 +54,7 @@ enum layer_names {
   NAV,
   FUNC,
   NUMP,
+  ETCH,
 };
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -62,28 +63,36 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   KC_ESC,   KC_1,   KC_2,    KC_3,    KC_4,    KC_5,                      KC_6,    KC_7,   KC_8,    KC_9,    KC_0,    KC_BSPC,
   KC_TAB,   KC_Q,   KC_W,    KC_E,    KC_R,    KC_T,                      KC_Y,    KC_U,   KC_I,    KC_O,    KC_P,    KC_BSLS,
   KC_GRV,   KC_A,   MT_S,    MT_D,    MT_F,    KC_G,                      KC_H,    MT_J,   MT_K,    MT_L,    KC_SCLN, KC_QUOT,
-  KC_LSFT,  KC_Z,   KC_X,    KC_C,    KC_V,    KC_B,  MS_BTN1,   MS_BTN2, KC_N,    KC_M,   KC_COMM, KC_DOT,  KC_SLSH, KC_RSFT,
+  KC_LSFT,  KC_Z,   KC_X,    KC_C,    KC_V,    KC_B,  _______,   _______, KC_N,    KC_M,   KC_COMM, KC_DOT,  KC_SLSH, KC_RSFT,
                     KC_LBRC, KC_RBRC, MO(FUNC),MO(NAV),KC_ENT,   MO(NAV), KC_SPC, MO(FUNC),KC_MINS, KC_EQL
 ),
 
-[GAME] = LAYOUT(//game (disable tap-hold keys)
+[TYPE] = LAYOUT(//temporary typing layer for the two below game layers, swaps back on ENT TODO
   KC_ESC,   KC_1,   KC_2,    KC_3,    KC_4,    KC_5,                      KC_6,    KC_7,   KC_8,    KC_9,    KC_0,    KC_BSPC,
   KC_TAB,   KC_Q,   KC_W,    KC_E,    KC_R,    KC_T,                      KC_Y,    KC_U,   KC_I,    KC_O,    KC_P,    KC_BSLS,
   KC_LCTL,  KC_A,   KC_S,    KC_D,    KC_F,    KC_G,                      KC_H,    KC_J,   KC_K,    KC_L,    KC_SCLN, KC_QUOT,
   KC_LSFT,  KC_Z,   KC_X,    KC_C,    KC_V,    KC_B, _______,    _______, KC_N,    KC_M,   KC_COMM, KC_DOT,  KC_SLSH, KC_RSFT,
-                    KC_I,    KC_M,   MO(FUNC),KC_LALT,KC_SPC,    MO(NAV), KC_ENT, MO(FUNC),KC_MINS, KC_EQL 
+                    KC_I,    KC_M,   MO(FUNC),KC_LALT,KC_SPC,    MO(NAV), KC_ENT, TG(GAME),KC_MINS, KC_EQL 
 ),
 
-[FPS] = LAYOUT( //fps (disabling the tap-hold keys and shifting a column to turn wasd into esdf)
+[GAME] = LAYOUT(//game (disable tap-hold keys, swap spc & enter)
+  KC_ESC,   KC_1,   KC_2,    KC_3,    KC_4,    KC_5,                      KC_6,    KC_7,   KC_8,    KC_9,    KC_0,    KC_BSPC,
+  KC_TAB,   KC_Q,   KC_W,    KC_E,    KC_R,    KC_T,                      KC_Y,    KC_U,   KC_I,    KC_O,    KC_P,    KC_BSLS,
+  KC_LCTL,  KC_A,   KC_S,    KC_D,    KC_F,    KC_G,                      KC_H,    KC_J,   KC_K,    KC_L,    KC_SCLN, KC_QUOT,
+  KC_LSFT,  KC_Z,   KC_X,    KC_C,    KC_V,    KC_B, _______,    _______, KC_N,    KC_M,   KC_COMM, KC_DOT,  KC_SLSH, KC_RSFT,
+                    KC_I,    KC_M,   MO(FUNC),KC_LALT,KC_SPC,    MO(NAV), KC_ENT, TG(GAME),KC_MINS, KC_EQL 
+),
+
+[FPS] = LAYOUT( //fps (GAME but also shifting a column on the left hand to turn wasd into esdf)
   KC_ESC,   KC_1,   KC_2,    KC_3,    KC_4,    KC_5,                      KC_6,    KC_7,   KC_8,    KC_9,    KC_0,    KC_BSPC,
   KC_TAB,   KC_T,   KC_Q,    KC_W,    KC_E,    KC_R,                      KC_Y,    KC_U,   KC_I,    KC_O,    KC_P,    KC_BSLS,
   KC_LCTL,  KC_G,   KC_A,    KC_S,    KC_D,    KC_F,                      KC_H,    KC_J,   KC_K,    KC_L,    KC_SCLN, KC_QUOT,
   KC_LSFT,  KC_B,   KC_Z,    KC_X,    KC_C,    KC_V,  _______,   _______, KC_N,    KC_M,   KC_COMM, KC_DOT,  KC_SLSH, KC_RSFT,
-                    KC_I,    KC_M,   MO(FUNC), KC_LALT,KC_SPC,   MO(NAV), KC_ENT, MO(FUNC),KC_MINS, KC_EQL 
+                    KC_I,    KC_M,   MO(FUNC), KC_LALT,KC_SPC,   MO(NAV), KC_ENT, TG(FPS), KC_MINS, KC_EQL 
 ),
 
 [NAV] = LAYOUT( //navigation
-  _______, _______, _______, _______, _______, _______,                   _______, _______, _______, _______, _______,  KC_DEL,
+  QK_LLCK, _______, _______, _______, _______, _______,                   _______, _______, _______, _______, _______,  KC_DEL,
   _______, _______, _______, KC_PGUP, _______, _______,                   CT_LEFT, _______, _______, CT_RGHT, _______, _______,
   _______, _______, KC_HOME, KC_PGDN,  KC_END, _______,                   KC_LEFT, KC_DOWN, KC_UP,   KC_RGHT, _______, _______,
   QK_LOCK, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, QK_LOCK,
@@ -94,7 +103,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   _______, KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,                       KC_F6,   KC_F7,   KC_F8,   KC_F9,  KC_F10, KC_F11,  
   _______, _______, _______, _______, _______, _______,                   _______, _______, SH_INS,  _______, _______, KC_F12,
   _______, _______, _______, _______, _______, _______,                   KC_MRWD, _______, _______, KC_MFFD, _______, _______,
-  CW_TOGG, _______, _______, _______, _______, _______, KC_MUTE, _______, _______, _______, KC_MPRV, KC_MNXT, _______, KC_CAPS,
+  CW_TOGG, _______, _______, _______, _______, _______, _______, _______, _______, KC_MUTE, KC_MPRV, KC_MNXT, _______, KC_CAPS,
                     _______, _______,TG(GAME), _______, KC_MPLY, KC_MPLY, _______, TG(FPS), _______, TG(NUMP)
 ),
 
@@ -103,18 +112,10 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                   XXXXXXX, KC_P4,   KC_P5,   KC_P6,   KC_PERC, KC_PIPE,
   XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                   XXXXXXX, KC_P1,   KC_P2,   KC_P3,   XXXXXXX, XXXXXXX,
   XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, _______, _______, KC_NUM,  KC_P0,   KC_PEQL, KC_PDOT, KC_PSLS, KC_ENT,
-                    XXXXXXX, XXXXXXX, TG(NUMP),KC_SPC , _______, XXXXXXX, _______, KC_PENT, KC_PMNS, KC_PPLS
-)
+                    XXXXXXX, XXXXXXX, TG(NUMP),KC_SPC,  _______, XXXXXXX, _______, KC_PENT, KC_PMNS, KC_PPLS
+),
 
 /*
-[MAUS] = LAYOUT( //mouse
-  _______, _______, _______, _______, _______, _______,                   _______, _______, _______, _______, _______, _______,
-  _______, _______, MS_BTN2, MS_BTN3, MS_BTN1, MB1HLD,                    _______, _______, _______, _______, _______, _______,
-  _______, _______, _______, _______, _______, _______,                   _______, _______, _______, _______, _______, _______,
-  _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
-                    _______, _______, _______, _______, _______, _______, _______, _______, _______, _______
-)
-
 [8] = LAYOUT(
   _______, _______, _______, _______, _______, _______,                   _______, _______, _______, _______, _______, _______,
   _______, _______, _______, _______, _______, _______,                   _______, _______, _______, _______, _______, _______,
@@ -171,7 +172,7 @@ void keyboard_post_init_user(void) {
   // console debug setup
   debug_enable = true;
   debug_keyboard = true;
-  debug_mouse = false;
+  debug_mouse = true;
 
   // annoying caps notification variables
   blink_timer = timer_read();
@@ -191,41 +192,8 @@ void housekeeping_task_user(void) {
 
 #ifdef ENCODER_ENABLE
 
-static uint8_t tth_keycode[2];
-static deferred_token tth_token = INVALID_DEFERRED_TOKEN;
-
-static uint32_t tth_timer(uint32_t trigger_time, void* nuthin) {
-  unregister_code(tth_keycode[0]); // this is real hacky :P
-  unregister_code(tth_keycode[1]);
-  return 0;
-}
-
-#define TTH_DELAY 250
-void tap_to_hold(uint8_t keycode, uint8_t index) {
-  tth_keycode[index] = keycode;
-  register_code(keycode);
-  if (!extend_deferred_exec(tth_token, TTH_DELAY)) {
-    tth_token = defer_exec(TTH_DELAY, tth_timer, NULL);
-  }
-}
-
 bool encoder_update_user(uint8_t index, bool clockwise) {
   switch(get_highest_layer(layer_state)) {
-    case NAV:
-      if (index == 1) {
-        if (clockwise) {
-          tap_code(MS_WHLD);
-        } else {
-          tap_code(MS_WHLU);
-        }
-      } else {
-        if (clockwise) {
-          tap_code(MS_WHLL);
-        } else {
-          tap_code(MS_WHLR);
-        }
-      }
-      break;
     case GAME:
     case FPS:
     case FUNC:
@@ -236,23 +204,22 @@ bool encoder_update_user(uint8_t index, bool clockwise) {
       }
       break;
     default:
-      if (index == 1) {
+      if (index == 0) {
         if (clockwise) {
-          tap_to_hold(MS_DOWN, index);
+          tap_code(MS_WHLU);
         } else {
-          tap_to_hold(MS_UP, index);
+          tap_code(MS_WHLD);
         }
       } else {
-         if (clockwise) {
-          tap_to_hold(MS_LEFT, index);
+        if (clockwise) {
+          tap_code(MS_WHLL);
         } else {
-          tap_to_hold(MS_RGHT, index);
-        }       
+          tap_code(MS_WHLR);
+        }
       }
   }
   return false;
 }
-
 
 #endif // ENCODER_ENABLE
 
